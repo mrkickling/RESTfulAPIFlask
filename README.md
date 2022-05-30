@@ -1,10 +1,19 @@
 # RESTful API for posting and reading messages
 This is a RESTful API that can receive, store (in memory) and provide messages to users, similar to pastebin. The messages will be removed after 7 days.
 
-The program is written in Python using the Flask framework. You need Python version > 3 and Flask.
+The program is written in Python using the Flask framework. You need Python version > 3.8.0 and Flask.
 
 # Install
-To install the required modules use pip using the requirements.txt (TODO) file provided in the repository.
+
+## Using pip
+Make sure that you have Python version > 3.8.0 and pip installed.
+To install the required modules use pip using the requirements.txt file provided in the repository by running:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Using Docker
 
 # Run
 To run the program, use the Makefile (command: make run)
@@ -27,7 +36,7 @@ The API service will respond with a JSON object containing the message_id of the
 
 Request:
 ```
-curl "http://127.0.0.1:5000/send" --data "text=hellothere
+curl "http://127.0.0.1:5000/send" --data "text=hellothere"
 ```
 Response:
 ```json
@@ -50,8 +59,11 @@ Response:
 
 # Design choices
 
+## JSON
+Is readable by humans and all programming languages have libraries to parse it. 
+
 ## Random ID
-The random ID is 10 characters long, and an alphabet of at least 32 characters is recommended. This would yield 32^10 possible combinations which is considered enough to never expect a collision.
+The random ID is 12 characters long, and an alphabet of at least 32 characters is recommended. This would yield 32^12 possible combinations which should avoid any collision.
 
 ## Removal of old messages
 After 7 days a message should be removed.
@@ -62,11 +74,17 @@ Another idea was to have an individual timer for each message, but this would pr
 My final idea was to just remove the messages that someone is requesting to read and which has already been active for 7 days. 
 This has a drawback, the server will still contain the messages after days. But it will be faster (only checks a message time on request), and it will never be possible to open a message which is more than 7 days old.
 
-The mesage might still remain in memory on the host machine, which is a potential security risk. If physical memory security is a factor this application should not be used.
+The message might still remain in memory on the host machine, which is a potential security risk. If physical memory security is a factor this application should not be used. Another issue is memory, since many messages will not be removed at all. To counter this I have put a limit on message sizes.
 
 ## Encryption (IMPORTANT!!!)
 There is currently NO encryption of either messages or requests or responses send to and from the API service. Please do not use this application as is if messages have to be kept secret from eavesdroppers and intruders, or if messages have to be e2 encrypted.
 However, you could of course encrypt your messages locally using e.g. PGP/GPG. 
+
+## Code injection
+If you are displaying the results make sure to sanitize the output that you get from the API. There is no string sanitization being done in the service.
+
+## Dos attacks
+IP blocking might be a future work
 
 ## Dependencies
 Dependencies are always a risk. Always make sure to keep all dependencies and Python updated to latest possible version.
