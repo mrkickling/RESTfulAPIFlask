@@ -12,23 +12,34 @@ To install the required modules use pip using the requirements.txt file provided
 ```bash
 pip install -r requirements.txt
 ```
+or
+```bash
+python -m pip install -r requirements.txt
+```
+On some systems with duplicate python versions the binaries are called pip3 and python3 instead.
 
 ## Using Docker
+I don't know, try it!
 
 # Run
-To run the program, use the Makefile (command: make run)
+To run the program, use the Makefile (`make run`) or simply use the commands:
 
-## Mac / Linux
-TODO
+```bash
+run:
+	export FLASK_APP=app
+	export FLASK_ENV=development
+	flask run
 
-## Windows
-TODO
+```
+
+## In production
+This service should not be run in production AS IS. 
+
 
 # API calls
-
 The API only has two possible calls.
 
-## POST /send --data="text=<TEXT>"
+## POST /write --data="text=<TEXT>"
 Create a message with a text provided in a post request.
 The API service will respond with a JSON object containing the message_id of the newly created message or Null if no message was created and a success parameter which is either 1 (True) or 0 (False) depending on if the message was created or not.
 
@@ -36,12 +47,16 @@ The API service will respond with a JSON object containing the message_id of the
 
 Request:
 ```
-curl "http://127.0.0.1:5000/send" --data "text=hellothere"
+curl "http://127.0.0.1:5000/write" --data "text=hellothere"
 ```
-Response:
+Response (200):
 ```json
 {"message":"hellothere","message_id":"tfltf3y5g1","time_posted":1653774375.88495}
 
+```
+If the text is too long you will get the response:
+```json
+{"error_message":"Message is too long","success":0}
 ```
 
 ## GET /read/:message_id
@@ -52,9 +67,13 @@ Request
 ```
 curl "http://127.0.0.1:5000/read/tfltf3y5g1"
 ```
-Response:
+Response (200):
 ```json
 {"message":"hellothere","message_id":"tfltf3y5g1","time_posted":1653774375.88495}
+```
+If the requested message is over 7 days old or does not exist you will get this response:
+```json
+{"error_message":"Message does not exist","success":0}
 ```
 
 # Design choices
