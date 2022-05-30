@@ -54,7 +54,7 @@ class TestApiHandler(unittest.TestCase):
         handler.save_message(message)
         assert len(handler.messages) == 1
         assert len(handler.time_sorted_message_ids) == 1
-        time.sleep(1)
+        time.sleep(15)
         res = handler.read_message(message_id)
         assert res["success"] == 0, "Should not be able to get old message"
         assert len(handler.messages) == 0, "Old message should be removed from list"
@@ -65,7 +65,7 @@ class TestApiHandler(unittest.TestCase):
         message_id = random_string(12)
         message = Message(message_id, "text", "hostname", time.time() - 6 * ONE_DAY_SECONDS)
         handler.save_message(message)
-        time.sleep(1)
+        time.sleep(15)
         # Should be able to read 6 day old message
         res = handler.read_message(message_id)
         assert res["success"] == 1, "Should be able to get old message"

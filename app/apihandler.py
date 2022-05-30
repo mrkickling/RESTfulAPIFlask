@@ -3,6 +3,7 @@ A class for methods related to the API calls and storage of messages
 Written by Joakim Loxdal 2022
 """
 
+import threading
 from collections import deque
 from app.utils import random_string, error_message
 from app.message import Message
@@ -13,6 +14,7 @@ class ApiHandler:
 	def __init__(self):
 		self.messages = {}
 		self.time_sorted_message_ids = deque()
+		threading.Timer(10, self.remove_old_messages) # Every 10 seconds
 
 	def save_message(self, message):
 		self.messages[message.id] = message
@@ -31,14 +33,13 @@ class ApiHandler:
 			message = self.messages[message_id]
 			if message.valid_time():
 				return message.to_dict()
-			else:
-				self.remove_old_messages()
 		return error_message("Message does not exist")
 
 	def remove_old_messages(self):
+		print("removing old messages")
 		while len(self.messages):
-			oldest_message_id = self.time_sorted_message_ids[0]
-			oldest_message = self.messages[oldest_message_id]
+			oldest_id = self.time_sorted_message_ids[0]
+			oldest_message = self.messages[oldest_id]
 			if not oldest_message.valid_time(): 
 				# Oldest message is too old, remove it
 				self.time_sorted_message_ids.popleft()
