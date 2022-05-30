@@ -12,8 +12,11 @@ def send_message():
 	  See docs for more detailed information.
 	"""
 	text = request.form.get('text')
-	res = api_handler.write_message(text, request.host)
-	return jsonify(res)
+	message = api_handler.write_message(text, request.host)
+	response = jsonify(message)
+	if message["success"] == 0:
+		response.status = 413
+	return response
 
 @app.route("/read/<message_id>")
 def read_message(message_id):
@@ -22,5 +25,8 @@ def read_message(message_id):
 		as a GET parameter (id). Returns the requested message in JSON format.
 		See docs for more detailed information.
 	"""
-	res = api_handler.read_message(message_id)
-	return res
+	message = api_handler.read_message(message_id)
+	response = jsonify(message)
+	if message["success"] == 0:
+		response.status = 404
+	return response
