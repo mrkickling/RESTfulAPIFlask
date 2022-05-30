@@ -1,11 +1,10 @@
 from python:3.9.7
 
 COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY app app
+COPY . .
 
-EXPOSE 8080
+RUN pip3 install -r requirements.txt
 
-CD app
-CMD export FLASK_APP=app
-RUN flask run -p 8080
+EXPOSE 5000
+
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
