@@ -18,9 +18,12 @@ python -m pip install -r requirements.txt
 ```
 On some systems with duplicate python versions the binaries are called pip3 and python3 instead.
 
-## Using Docker
-I don't know, try it!
-
+## Using docker
+Make sure you have docker installed and that you are in this directory.
+```bash
+docker image build -t flask_api_docker .
+docker run -p 5000:5000 -d flask_docker
+```
 # Run
 To run the program, use the Makefile (`make run`) or simply use the commands:
 
@@ -28,14 +31,13 @@ To run the program, use the Makefile (`make run`) or simply use the commands:
 export FLASK_APP=app
 export FLASK_ENV=development
 flask run
-
 ```
 
 ## In production
 This service should not be run in production as is. To run in production use a [WSGI (Web Server Gateway Interface)](https://flask.palletsprojects.com/en/1.0.x/deploying/wsgi-standalone/) implementation like [Gunicorn](https://gunicorn.org/) or [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/). 
 
 # API calls
-The API only has two possible calls.
+The API only has two possible calls:
 
 ## POST /write --data="text=<TEXT>"
 Create a message with a text provided in a post request.
@@ -82,15 +84,14 @@ Is readable by humans and practically all programming languages have libraries t
 ## Random ID
 The random ID is 12 characters long, and an alphabet of 26 characters is used per default. This would yield 26^12 ( = 9.5 x 10^16 ) possible combinations which should avoid any collisions.
 
-## Removal of old messages
+## Removing old messages
+### Ideas
 After 7 days a message should be removed.
 My first idea was to remove the message using a timer that checks all messages every new day and compare their creation date with todays date. 
-
 Another idea was to have an individual timer (thread) for each message, but this would probably be too memory intense. 
 
-My third idea was to just remove the messages that someone is requesting to read and have timed out. This has a drawback, the server will still contain the messages after 7 days in many cases. But it will be faster (only checks a message time on request), and it will still never be possible to open a message which is more than 7 days old.
-
-The message might still remain in memory on the host machine, which is a potential security risk. If physical memory security is a factor this application should not be used. Another issue is memory, since many messages will not be removed at all. To counter this I have put a limit on message sizes.
+### Final solution
+My final idea was to just remove all old messages every time an api call is made to the server. This fulfills the needs, but might open up DoS attack vulnerabilities.
 
 ## Encryption
 There is currently NO encryption of either messages or requests or responses send to and from the API service. Please do not use this application as is if messages have to be kept secret from eavesdroppers and intruders, or if messages have to be e2 encrypted.
@@ -99,7 +100,7 @@ However, you could of course encrypt your messages locally using e.g. PGP/GPG.
 ## Code injection
 If you are displaying the results make sure to sanitize the output that you get from the API. There is no string sanitization being done in the service.
 
-## Dos attacks
+## DoS attacks
 Dos attacks are always a risk when connecting a service to the internet. Overflooding of big messages is a potential risk. IP-blocking could be one solution to decrease the risk for this.
 
 ## Dependencies
