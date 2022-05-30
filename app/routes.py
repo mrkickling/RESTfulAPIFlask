@@ -7,9 +7,9 @@ api_handler = ApiHandler()
 @app.route("/write", methods=["POST"])
 def send_message():
 	"""
-	  The API call for sending new messages to store in memory.
-	  Returns the new message in JSON format.
-	  See docs for more detailed information.
+	The API call for sending new messages to store in memory.
+	Returns the new message in JSON format.
+	See docs for more detailed information.
 	"""
 	text = request.form.get('text')
 	message = api_handler.write_message(text, request.host)
@@ -21,9 +21,9 @@ def send_message():
 @app.route("/read/<message_id>")
 def read_message(message_id):
 	"""
-		The API call for reading messages by giving the ID of the message
-		as a GET parameter (id). Returns the requested message in JSON format.
-		See docs for more detailed information.
+	The API call for reading messages by giving the ID of the message
+	as a GET parameter (id). Returns the requested message in JSON format.
+	See docs for more detailed information.
 	"""
 	message = api_handler.read_message(message_id)
 	response = jsonify(message)
