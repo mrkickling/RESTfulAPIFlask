@@ -25,10 +25,9 @@ I don't know, try it!
 To run the program, use the Makefile (`make run`) or simply use the commands:
 
 ```bash
-run:
-	export FLASK_APP=app
-	export FLASK_ENV=development
-	flask run
+export FLASK_APP=app
+export FLASK_ENV=development
+flask run
 
 ```
 
