@@ -25,13 +25,14 @@ docker image build -t flask_api_docker .
 docker run -p 5000:5000 -d flask_docker
 ```
 # Run
-To run the program, use the Makefile (`make run`) or simply use the commands:
+To run the program, use the bash file (run.sh, has to be made executable) or simply use the commands:
 
 ```bash
 export FLASK_APP=app
 export FLASK_ENV=development
 flask run
 ```
+I have not been able to verify this process on Windows, but I suspect WSL would do the trick if nothing else works.
 
 ## In production
 This service should not be run in production as is. To run in production use a [WSGI (Web Server Gateway Interface)](https://flask.palletsprojects.com/en/1.0.x/deploying/wsgi-standalone/) implementation like [Gunicorn](https://gunicorn.org/) or [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/). 
@@ -85,13 +86,10 @@ Is readable by humans and practically all programming languages have libraries t
 The random ID is 12 characters long, and an alphabet of 26 characters is used per default. This would yield 26^12 ( = 9.5 x 10^16 ) possible combinations which should avoid any collisions.
 
 ## Removing old messages
-### Ideas
-After 7 days a message should be removed.
-My first idea was to remove the message using a timer that checks all messages every new day and compare their creation date with todays date. 
-Another idea was to have an individual timer (thread) for each message, but this would probably be too memory intense. 
+After 7 days a message will be removed.
+I run a function every 10 seconds on its own thread (apihandler.py, line 17) This function checks the messages by walking through a deque, starting with the oldest message. It will remove messages if they are over 7 days old, and stop walking through the deque when it finds a newer message. This was the best solution that I came up with since a requirement was to remove the messages automatically within 7 days. Other ideas was to only remove messages on api calls, but this was not sufficient according to the requirements.
 
-### Final solution
-My final idea was to just remove all old messages every time an api call is made to the server. This fulfills the needs, but might open up DoS attack vulnerabilities.
+NOTE: The messages might remain hidden in unused memory until they are overwritten. This could be a problem in some applications. 
 
 ## Encryption
 There is currently NO encryption of either messages or requests or responses send to and from the API service. Please do not use this application as is if messages have to be kept secret from eavesdroppers and intruders, or if messages have to be e2 encrypted.
@@ -105,6 +103,9 @@ Dos attacks are always a risk when connecting a service to the internet. Overflo
 
 ## Dependencies
 Dependencies are always a risk, since they all might have vulneratbilities in them. Always make sure to keep all dependencies and Python up to date.
+
+# Unit test
+Tests are provided in tests/test_api.py and are hopefully self explanatory. They can be run just like any python program.
 
 # License
 The program is released under GPLv2, which means that anyone can use, manipulate and read the source code without asking for permission or attributing me. However, you have to release any modified version of the program under GPLv2 as well.
