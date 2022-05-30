@@ -1,8 +1,8 @@
 from app import app
 from flask import request, jsonify
-from app.apihandler import ApiHandler
+from app.messagehandler import MessageHandler
 
-api_handler = ApiHandler()
+handler = MessageHandler()
 
 @app.route("/write", methods=["POST"])
 def send_message():
@@ -12,7 +12,7 @@ def send_message():
 	See docs for more detailed information.
 	"""
 	text = request.form.get('text')
-	message = api_handler.write_message(text, request.host)
+	message = handler.write_message(text, request.host)
 	response = jsonify(message)
 	if message["success"] == 0:
 		response.status = 413
@@ -25,7 +25,7 @@ def read_message(message_id):
 	as a GET parameter (id). Returns the requested message in JSON format.
 	See docs for more detailed information.
 	"""
-	message = api_handler.read_message(message_id)
+	message = handler.read_message(message_id)
 	response = jsonify(message)
 	if message["success"] == 0:
 		response.status = 404

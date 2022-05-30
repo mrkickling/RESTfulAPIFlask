@@ -4,15 +4,15 @@ current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfra
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 
-from app.apihandler import ApiHandler
+from app.messagehandler import MessageHandler
 from app.utils import random_string
 from app.message import Message
 
 ONE_DAY_SECONDS = 24 * 60 * 60
 
-class TestApiHandler(unittest.TestCase):
+class TestMessageHandler(unittest.TestCase):
     def test_write_message(self):
-        handler = ApiHandler()
+        handler = MessageHandler()
         res = handler.write_message("text", "hostname")
         assert res["success"] == 1
         assert len(handler.messages) == 1
@@ -24,7 +24,7 @@ class TestApiHandler(unittest.TestCase):
         assert len(handler.time_sorted_message_ids) == 2
 
     def test_write_long_message(self):
-        handler = ApiHandler()
+        handler = MessageHandler()
         very_long_string = random_string(1024 * 1024)
         res = handler.write_message(very_long_string, "hostname")
         assert res["success"] == 0, "message was too long"
@@ -32,7 +32,7 @@ class TestApiHandler(unittest.TestCase):
         assert len(handler.time_sorted_message_ids) == 0, "should not be added to list"
  
     def test_read_message(self):
-        handler = ApiHandler()
+        handler = MessageHandler()
         string_to_write = random_string(1000)
         res = handler.write_message(string_to_write, "hostname")
 
@@ -48,7 +48,7 @@ class TestApiHandler(unittest.TestCase):
         assert res["success"] == 1, "Should definitely succeed"
 
     def test_delete_old_messages(self):
-        handler = ApiHandler()
+        handler = MessageHandler()
         message_id = random_string(12)
         message = Message(message_id, "text", "hostname", time.time() - 7 * ONE_DAY_SECONDS)
         handler.save_message(message)
@@ -61,7 +61,7 @@ class TestApiHandler(unittest.TestCase):
         assert len(handler.time_sorted_message_ids) == 0, "Old message should be removed from list"
 
     def test_six_day_old_messages(self):
-        handler = ApiHandler()
+        handler = MessageHandler()
         message_id = random_string(12)
         message = Message(message_id, "text", "hostname", time.time() - 6 * ONE_DAY_SECONDS)
         handler.save_message(message)

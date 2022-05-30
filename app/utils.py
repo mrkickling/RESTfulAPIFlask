@@ -8,8 +8,8 @@ import string
 
 def random_string(n, alphabet=string.ascii_lowercase):
 	"""
-		random string will return a random string of length 'n',
-		using characters from the string 'alphabet'.
+	random string will return a random string of length 'n',
+	using characters from the string 'alphabet'.
 	"""
 	string = ""
 	for i in range(n):

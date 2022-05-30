@@ -1,8 +1,7 @@
 """ 
-A class for methods related to the API calls and storage of messages
+A class for methods related to the message API calls and storage of messages
 Written by Joakim Loxdal 2022
 """
-
 import threading, time
 from collections import deque
 from app.utils import random_string, error_message
@@ -10,7 +9,7 @@ from app.message import Message
 
 MESSAGE_MAX_NUM_CHARS = 10 * 1024
 
-class ApiHandler:
+class MessageHandler:
 	def __init__(self):
 		self.messages = {}
 		self.time_sorted_message_ids = deque()
@@ -37,6 +36,10 @@ class ApiHandler:
 		return error_message("Message does not exist")
 
 	def remove_old_messages(self):
+		""" 
+		Removes all messages that are > 7 days old,
+		by moving through a deque. Repeats every 10 seconds.
+		"""
 		while True:
 			while len(self.messages):
 				oldest_id = self.time_sorted_message_ids[0]
