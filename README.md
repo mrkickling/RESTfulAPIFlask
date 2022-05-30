@@ -1,12 +1,12 @@
 # RESTful API for posting and reading messages
 This is a RESTful API that can receive, store (in memory) and provide messages to users, similar to pastebin. The messages will be removed after 7 days.
 
-The program is written in Python using the Flask framework. You need Python version > 3.8.0 and Flask.
+The program is written in Python using the Flask framework. You need Python 3 and Flask.
 
 # Install
 
 ## Using pip
-Make sure that you have Python version > 3.8.0 and pip installed.
+Make sure that you have Python 3 and pip installed.
 To install the required modules use pip using the requirements.txt file provided in the repository by running:
 
 ```bash
