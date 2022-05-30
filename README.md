@@ -100,10 +100,10 @@ However, you could of course encrypt your messages locally using e.g. PGP/GPG.
 If you are displaying the results make sure to sanitize the output that you get from the API. There is no string sanitization being done in the service.
 
 ## Dos attacks
-IP blocking might be a future work
+Dos attacks are always a risk when connecting a service to the internet. Overflooding of big messages is a potential risk. IP-blocking could be one solution to decrease the risk for this.
 
 ## Dependencies
-Dependencies are always a risk. Always make sure to keep all dependencies and Python updated to latest possible version.
+Dependencies are always a risk, since they all might have vulneratbilities in them. Always make sure to keep all dependencies and Python up to date.
 
 # License
 The program is released under GPLv2, which means that anyone can use, manipulate and read the source code without asking for permission or attributing me. However, you have to release any modified version of the program under GPLv2 as well.
