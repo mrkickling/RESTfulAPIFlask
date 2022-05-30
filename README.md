@@ -32,8 +32,7 @@ flask run
 ```
 
 ## In production
-This service should not be run in production AS IS. 
-
+This service should not be run in production as is. To run in production use a [WSGI (Web Server Gateway Interface)](https://flask.palletsprojects.com/en/1.0.x/deploying/wsgi-standalone/) implementation like [Gunicorn](https://gunicorn.org/) or [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/). 
 
 # API calls
 The API only has two possible calls.
@@ -44,16 +43,16 @@ The API service will respond with a JSON object containing the message_id of the
 
 ### Example
 
-Request:
+Request (using curl):
 ```
 curl "http://127.0.0.1:5000/write" --data "text=hellothere"
 ```
 Response (200):
 ```json
-{"message":"hellothere","message_id":"tfltf3y5g1","time_posted":1653774375.88495}
+{"message":"hellothere","message_id":"cfybrtvsfujo","success":1,"url":"127.0.0.1:5000/read/cfybrtvsfujo"}
 
 ```
-If the text is too long you will get the response:
+If the text is too long you will get the response (413):
 ```json
 {"error_message":"Message is too long","success":0}
 ```
@@ -64,13 +63,13 @@ Read the content of a message with message_id provided. Returns a JSON object co
 ### Example
 Request 
 ```
-curl "http://127.0.0.1:5000/read/tfltf3y5g1"
+curl "http://127.0.0.1:5000/read/cfybrtvsfujo"
 ```
 Response (200):
 ```json
-{"message":"hellothere","message_id":"tfltf3y5g1","time_posted":1653774375.88495}
+{"message":"hellothere","message_id":"cfybrtvsfujo","success":1,"url":"127.0.0.1:5000/read/cfybrtvsfujo"}
 ```
-If the requested message is over 7 days old or does not exist you will get this response:
+If the requested message is over 7 days old or does not exist you will get the response (404):
 ```json
 {"error_message":"Message does not exist","success":0}
 ```
@@ -78,23 +77,22 @@ If the requested message is over 7 days old or does not exist you will get this 
 # Design choices
 
 ## JSON
-Is readable by humans and all programming languages have libraries to parse it. 
+Is readable by humans and practically all programming languages have libraries to parse it. 
 
 ## Random ID
-The random ID is 12 characters long, and an alphabet of at least 32 characters is recommended. This would yield 32^12 possible combinations which should avoid any collision.
+The random ID is 12 characters long, and an alphabet of 26 characters is used per default. This would yield 26^12 ( = 9.5 x 10^16 ) possible combinations which should avoid any collisions.
 
 ## Removal of old messages
 After 7 days a message should be removed.
-My first idea was to just remove the message using a timer that checks all messages every new day and compare their creation date with todays date. 
+My first idea was to remove the message using a timer that checks all messages every new day and compare their creation date with todays date. 
 
-Another idea was to have an individual timer for each message, but this would probably be too memory intense. 
+Another idea was to have an individual timer (thread) for each message, but this would probably be too memory intense. 
 
-My final idea was to just remove the messages that someone is requesting to read and which has already been active for 7 days. 
-This has a drawback, the server will still contain the messages after days. But it will be faster (only checks a message time on request), and it will never be possible to open a message which is more than 7 days old.
+My third idea was to just remove the messages that someone is requesting to read and have timed out. This has a drawback, the server will still contain the messages after 7 days in many cases. But it will be faster (only checks a message time on request), and it will still never be possible to open a message which is more than 7 days old.
 
 The message might still remain in memory on the host machine, which is a potential security risk. If physical memory security is a factor this application should not be used. Another issue is memory, since many messages will not be removed at all. To counter this I have put a limit on message sizes.
 
-## Encryption (IMPORTANT!!!)
+## Encryption
 There is currently NO encryption of either messages or requests or responses send to and from the API service. Please do not use this application as is if messages have to be kept secret from eavesdroppers and intruders, or if messages have to be e2 encrypted.
 However, you could of course encrypt your messages locally using e.g. PGP/GPG. 
 
